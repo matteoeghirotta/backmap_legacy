@@ -11,6 +11,7 @@
 #include "fragment.h"
 #include "quat_utils.h"
 #include "file_utils.h"
+#include "trie.h"
 
 typedef enum {
   dump_atom_fields_id,
@@ -38,8 +39,9 @@ typedef enum {
 typedef struct section {
   char const *header;
   int nfields;
-  int *indices;
   char const *name;
+  int *indices;
+  struct trie *field_index_map;
 } section;
 
 #define section_is(section, name)						    \
