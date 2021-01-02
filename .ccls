@@ -1,0 +1,7 @@
+-I
+./include
+-x
+c
+-std=c11
+-Wall
+-Wextra
