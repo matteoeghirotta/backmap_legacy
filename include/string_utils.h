@@ -53,10 +53,10 @@
   }									     \
 
 
-#define token_iter(token_string, delim, token, ...)			     \
+#define token_iter(input_string, delim, token, ...)			     \
   {									     \
     char *save_ptr = NULL;						     \
-    char *dup = strdup(token_string);					     \
+    char *dup = strdup(input_string);					     \
     char *token = strtok_r(dup, delim, &save_ptr);			     \
 									     \
     __VA_ARGS__;							     \
