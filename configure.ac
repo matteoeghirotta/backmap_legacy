@@ -3,7 +3,9 @@ AC_INIT([backmap], [0.0], [matteoeghirotta@gmail.com])
 AM_INIT_AUTOMAKE([foreign dist-xz -Wall -Werror]) # silent-rules
 AC_CONFIG_SRCDIR([src/backmap.c])
 
-AC_PROG_CC([gcc clang])
+: ${CFLAGS=""}
+
+AC_PROG_CC([clang gcc])
 #AC_PROG_CC([musl-gcc gcc clang])
 AC_PROG_CC_STDC
 AM_PROG_CC_C_O

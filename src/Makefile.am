@@ -1,7 +1,4 @@
-#CC = /usr/local/gcc-6.2.0/bin/gcc
-#CC = /usr/local/gcc-5.4.0/bin/gcc
-#CC = musl-gcc
-#CC = clang
+AM_CFLAGS =
 
 bin_PROGRAMS = backmap
 backmap_SANITIZE = -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer
@@ -10,7 +7,7 @@ backmap_DEBUG_FLAGS = -g -Wall -Wextra -Werror -Wno-nullability-completeness
 # backmap_DEBUG_FLAGS = -g -Wall -Wextra -Werror #-Wno-missing-field-initializers
 backmap_CFLAGS = $(backmap_DEBUG_FLAGS) #$(backmap_SANITIZE)
 backmap_CPPFLAGS = -I$(top_srcdir)/include -I$(LEVMAR_DIR)
-backmap_LDADD = -L$(LEVMAR_DIR) #-llevmar -lblas -llapack -lm
+# backmap_LDADD = -L$(LEVMAR_DIR) #-llevmar -lblas -llapack -lm
 #backmap_LDFLAGS = -static
 backmap_LDFLAGS = 
 

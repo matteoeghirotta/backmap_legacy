@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdarg.h>
 #include "particle.h"
 #include "string_utils.h"
 #include "fragment.h"
@@ -14,34 +15,253 @@
 #include "trie.h"
 
 typedef enum {
-  dump_atom_fields_id,
-  dump_atom_fields_type,
-  dump_atom_fields_x,
-  dump_atom_fields_y,
-  dump_atom_fields_z,
-  dump_atom_fields_qw,
-  dump_atom_fields_qx,
-  dump_atom_fields_qy,
-  dump_atom_fields_qz,
-  dump_atom_fields_shapex,
-  dump_atom_fields_shapey,
-  dump_atom_fields_shapez,
-  dump_atom_fields_vx,
-  dump_atom_fields_vy,
-  dump_atom_fields_vz,
-  dump_atom_fields_angmomx,
-  dump_atom_fields_angmomy,
-  dump_atom_fields_angmomz,
-  dump_atom_fields_mol,
-  dump_atom_fields_END
-} dump_atom_fields;
+  dump_atom_field_id,
+  dump_atom_field_type,
+  dump_atom_field_x,
+  dump_atom_field_y,
+  dump_atom_field_z,
+  dump_atom_field_qw,
+  dump_atom_field_qx,
+  dump_atom_field_qy,
+  dump_atom_field_qz,
+  dump_atom_field_shapex,
+  dump_atom_field_shapey,
+  dump_atom_field_shapez,
+  dump_atom_field_vx,
+  dump_atom_field_vy,
+  dump_atom_field_vz,
+  dump_atom_field_angmomx,
+  dump_atom_field_angmomy,
+  dump_atom_field_angmomz,
+  dump_atom_field_mol,
+  dump_atom_field_END
+} dump_atom_field;
+
+typedef struct atom_field {
+  dump_atom_field field_type;
+  bool optional;
+  int n_keywords;
+  const char *keywords[10];
+} atom_field;
+
+atom_field atom_field_id = {
+  .field_type = dump_atom_field_id,
+  .optional = false,
+  .n_keywords = 1,
+  .keywords = {
+    "id"
+  }
+};
+
+atom_field atom_field_type = {
+  .field_type = dump_atom_field_type,
+  .optional = false,
+  .n_keywords = 1,
+  .keywords = {
+    "type"
+  }
+};
+
+atom_field atom_field_x = {
+  .field_type = dump_atom_field_x,
+  .optional = false,
+  .n_keywords = 2,
+  .keywords = {
+    "x",
+    "xu"
+  }
+};
+
+atom_field atom_field_y = {
+  .field_type = dump_atom_field_y,
+  .optional = false,
+  .n_keywords = 2,
+  .keywords = {
+    "y",
+    "yu"
+  }
+};
+
+atom_field atom_field_z = {
+  .field_type = dump_atom_field_z,
+  .optional = false,
+  .n_keywords = 2,
+  .keywords = {
+    "z",
+    "zu"
+  }
+};
+
+atom_field atom_field_qw = {
+  .field_type = dump_atom_field_qw,
+  .optional = false,
+  .n_keywords = 3,
+  .keywords = {
+    "qw",
+    "quatw",
+    "c_q[1]"
+  }
+};
+
+atom_field atom_field_qx = {
+  .field_type = dump_atom_field_qx,
+  .optional = false,
+  .n_keywords = 3,
+  .keywords = {
+    "qx",
+    "quatx",
+    "c_q[2]"
+  }
+};
+
+atom_field atom_field_qy = {
+  .field_type = dump_atom_field_qy,
+  .optional = false,
+  .n_keywords = 3,
+  .keywords = {
+    "qy",
+    "quaty",
+    "c_q[3]"
+  }
+};
+
+atom_field atom_field_qz = {
+  .field_type = dump_atom_field_qz,
+  .optional = false,
+  .n_keywords = 3,
+  .keywords = {
+    "qz",
+    "quatz",
+    "c_q[4]"
+  }
+};
+
+atom_field atom_field_shapex = {
+  .field_type = dump_atom_field_shapex,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_shape[1]",
+    "shapex"
+  }
+};
+
+atom_field atom_field_shapey = {
+  .field_type = dump_atom_field_shapey,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_shape[2]",
+    "shapey"
+  }
+};
+
+atom_field atom_field_shapez = {
+  .field_type = dump_atom_field_shapez,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_shape[3]",
+    "shapez"
+  }
+};
+
+atom_field atom_field_vx = {
+  .field_type = dump_atom_field_vx,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_v[1]",
+    "vx"
+  }
+};
+
+atom_field atom_field_vy = {
+  .field_type = dump_atom_field_y,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_v[2]",
+    "vy"
+  }
+};
+
+atom_field atom_field_vz = {
+  .field_type = dump_atom_field_vz,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_v[3]",
+    "vz"
+  }
+};
+
+atom_field atom_field_angmomx = {
+  .field_type = dump_atom_field_angmomx,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_angmom[1]",
+    "angmomx"
+  }
+};
+
+atom_field atom_field_angmomy = {
+  .field_type = dump_atom_field_y,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_angmom[2]",
+    "angmomy"
+  }
+};
+
+atom_field atom_field_angmomz = {
+  .field_type = dump_atom_field_angmomz,
+  .optional = true,
+  .n_keywords = 2,
+  .keywords = {
+    "c_angmom[3]",
+    "angmomz"
+  }
+};
+
+atom_field atom_field_mol = {
+  .field_type = dump_atom_field_mol,
+  .optional = false,
+  .n_keywords = 1,
+  .keywords = {
+    "mol"
+  }
+};
+
+atom_field *atom_fields[] = {
+  &atom_field_id,
+  &atom_field_type,
+  &atom_field_x,
+  &atom_field_y,
+  &atom_field_z,
+  &atom_field_qw,
+  &atom_field_qx,
+  &atom_field_qy,
+  &atom_field_qz,
+  &atom_field_shapex,
+  &atom_field_shapey,
+  &atom_field_shapez,
+  &atom_field_vx,
+  &atom_field_vy,
+  &atom_field_vz,
+  &atom_field_angmomx,
+  &atom_field_angmomy,
+  &atom_field_angmomz,
+  &atom_field_mol
+};
 
 typedef struct section {
   char const *header;
   int nfields;
   char const *name;
   int *indices;
-  struct trie *field_index_map;
 } section;
 
 #define section_is(section, name)						    \
@@ -65,33 +285,39 @@ section section_bounds = {
   .name = "bounds"
 };
 
+section section_atoms_generic = {
+  .header = "ITEM: ATOMS",
+  .nfields = 9+3+7,
+  .name = "atoms",
+};
+
 section section_atoms = {
   .header = "ITEM: ATOMS "
   "id type x y z c_q[1] c_q[2] c_q[3] c_q[4] "
   "c_shape[1] c_shape[2] c_shape[3] "
   "vx vy vz angmomx angmomy angmomz mol",
   .nfields = 9+3+7,
-  .name = "atoms",
+  .name = "atoms1",
   .indices = (int[]) {
-    [dump_atom_fields_id] = 0,
-    [dump_atom_fields_type] = 1,
-    [dump_atom_fields_x] = 2,
-    [dump_atom_fields_y] = 3,
-    [dump_atom_fields_z] = 4,
-    [dump_atom_fields_qw] = 5,
-    [dump_atom_fields_qx] = 6,
-    [dump_atom_fields_qy] = 7,
-    [dump_atom_fields_qz] = 8,
-    [dump_atom_fields_shapex] = 9,
-    [dump_atom_fields_shapey] = 10,
-    [dump_atom_fields_shapez] = 11,
-    [dump_atom_fields_vx] = 12,
-    [dump_atom_fields_vy] = 13,
-    [dump_atom_fields_vz] = 14,
-    [dump_atom_fields_angmomx] = 15,
-    [dump_atom_fields_angmomy] = 16,
-    [dump_atom_fields_angmomz] = 17,
-    [dump_atom_fields_mol] = 18
+    [dump_atom_field_id] = 0,
+    [dump_atom_field_type] = 1,
+    [dump_atom_field_x] = 2,
+    [dump_atom_field_y] = 3,
+    [dump_atom_field_z] = 4,
+    [dump_atom_field_qw] = 5,
+    [dump_atom_field_qx] = 6,
+    [dump_atom_field_qy] = 7,
+    [dump_atom_field_qz] = 8,
+    [dump_atom_field_shapex] = 9,
+    [dump_atom_field_shapey] = 10,
+    [dump_atom_field_shapez] = 11,
+    [dump_atom_field_vx] = 12,
+    [dump_atom_field_vy] = 13,
+    [dump_atom_field_vz] = 14,
+    [dump_atom_field_angmomx] = 15,
+    [dump_atom_field_angmomy] = 16,
+    [dump_atom_field_angmomz] = 17,
+    [dump_atom_field_mol] = 18
   }
 };
 
@@ -102,25 +328,25 @@ section section_atoms_novel = {
   .nfields = 9+4,
   .name = "atoms_novel",
   .indices = (int[]) {
-    [dump_atom_fields_id] = 0,
-    [dump_atom_fields_type] = 1,
-    [dump_atom_fields_x] = 2,
-    [dump_atom_fields_y] = 3,
-    [dump_atom_fields_z] = 4,
-    [dump_atom_fields_qw] = 5,
-    [dump_atom_fields_qx] = 6,
-    [dump_atom_fields_qy] = 7,
-    [dump_atom_fields_qz] = 8,
-    [dump_atom_fields_shapex] = 9,
-    [dump_atom_fields_shapey] = 10,
-    [dump_atom_fields_shapez] = 11,
-    [dump_atom_fields_vx] = -1,
-    [dump_atom_fields_vy] = -1,
-    [dump_atom_fields_vz] = -1,
-    [dump_atom_fields_angmomx] = -1,
-    [dump_atom_fields_angmomy] = -1,
-    [dump_atom_fields_angmomz] = -1,
-    [dump_atom_fields_mol] = 12
+    [dump_atom_field_id] = 0,
+    [dump_atom_field_type] = 1,
+    [dump_atom_field_x] = 2,
+    [dump_atom_field_y] = 3,
+    [dump_atom_field_z] = 4,
+    [dump_atom_field_qw] = 5,
+    [dump_atom_field_qx] = 6,
+    [dump_atom_field_qy] = 7,
+    [dump_atom_field_qz] = 8,
+    [dump_atom_field_shapex] = 9,
+    [dump_atom_field_shapey] = 10,
+    [dump_atom_field_shapez] = 11,
+    [dump_atom_field_vx] = -1,
+    [dump_atom_field_vy] = -1,
+    [dump_atom_field_vz] = -1,
+    [dump_atom_field_angmomx] = -1,
+    [dump_atom_field_angmomy] = -1,
+    [dump_atom_field_angmomz] = -1,
+    [dump_atom_field_mol] = 12
   }
 };
 
@@ -131,25 +357,25 @@ section section_atoms_novel_unwrap = {
   .nfields = 9+4,
   .name = "atoms_novel_unwrap",
   .indices = (int[]) {
-    [dump_atom_fields_id] = 0,
-    [dump_atom_fields_type] = 1,
-    [dump_atom_fields_x] = 2,
-    [dump_atom_fields_y] = 3,
-    [dump_atom_fields_z] = 4,
-    [dump_atom_fields_qw] = 5,
-    [dump_atom_fields_qx] = 6,
-    [dump_atom_fields_qy] = 7,
-    [dump_atom_fields_qz] = 8,
-    [dump_atom_fields_shapex] = 9,
-    [dump_atom_fields_shapey] = 10,
-    [dump_atom_fields_shapez] = 11,
-    [dump_atom_fields_vx] = -1,
-    [dump_atom_fields_vy] = -1,
-    [dump_atom_fields_vz] = -1,
-    [dump_atom_fields_angmomx] = -1,
-    [dump_atom_fields_angmomy] = -1,
-    [dump_atom_fields_angmomz] = -1,
-    [dump_atom_fields_mol] = 12
+    [dump_atom_field_id] = 0,
+    [dump_atom_field_type] = 1,
+    [dump_atom_field_x] = 2,
+    [dump_atom_field_y] = 3,
+    [dump_atom_field_z] = 4,
+    [dump_atom_field_qw] = 5,
+    [dump_atom_field_qx] = 6,
+    [dump_atom_field_qy] = 7,
+    [dump_atom_field_qz] = 8,
+    [dump_atom_field_shapex] = 9,
+    [dump_atom_field_shapey] = 10,
+    [dump_atom_field_shapez] = 11,
+    [dump_atom_field_vx] = -1,
+    [dump_atom_field_vy] = -1,
+    [dump_atom_field_vz] = -1,
+    [dump_atom_field_angmomx] = -1,
+    [dump_atom_field_angmomy] = -1,
+    [dump_atom_field_angmomz] = -1,
+    [dump_atom_field_mol] = 12
   }
 };
 
@@ -161,27 +387,56 @@ section section_atoms_unwrap = {
   .nfields = 9+3+7,
   .name = "atoms_unwrap",
   .indices = (int[]) {
-    [dump_atom_fields_id] = 0,
-    [dump_atom_fields_type] = 1,
-    [dump_atom_fields_x] = 2,
-    [dump_atom_fields_y] = 3,
-    [dump_atom_fields_z] = 4,
-    [dump_atom_fields_qw] = 5,
-    [dump_atom_fields_qx] = 6,
-    [dump_atom_fields_qy] = 7,
-    [dump_atom_fields_qz] = 8,
-    [dump_atom_fields_shapex] = 9,
-    [dump_atom_fields_shapey] = 10,
-    [dump_atom_fields_shapez] = 11,
-    [dump_atom_fields_vx] = 12,
-    [dump_atom_fields_vy] = 13,
-    [dump_atom_fields_vz] = 14,
-    [dump_atom_fields_angmomx] = 15,
-    [dump_atom_fields_angmomy] = 16,
-    [dump_atom_fields_angmomz] = 17,
-    [dump_atom_fields_mol] = 18
+    [dump_atom_field_id] = 0,
+    [dump_atom_field_type] = 1,
+    [dump_atom_field_x] = 2,
+    [dump_atom_field_y] = 3,
+    [dump_atom_field_z] = 4,
+    [dump_atom_field_qw] = 5,
+    [dump_atom_field_qx] = 6,
+    [dump_atom_field_qy] = 7,
+    [dump_atom_field_qz] = 8,
+    [dump_atom_field_shapex] = 9,
+    [dump_atom_field_shapey] = 10,
+    [dump_atom_field_shapez] = 11,
+    [dump_atom_field_vx] = 12,
+    [dump_atom_field_vy] = 13,
+    [dump_atom_field_vz] = 14,
+    [dump_atom_field_angmomx] = 15,
+    [dump_atom_field_angmomy] = 16,
+    [dump_atom_field_angmomz] = 17,
+    [dump_atom_field_mol] = 18
   }
 };
+
+int *
+section_atoms_generic_parse(char const* line) {
+    printf("LINE: %s of %i\n", line, dump_atom_field_END);
+
+    int *indices = calloc(dump_atom_field_END, sizeof(int));
+
+    int field_count = 0;
+
+    token_iter(line,
+	       " ",
+	       tok,
+               // printf("DEBUG %2i <%s>\n", ntok, tok);
+               for (size_t i=0; i<sizeof(atom_fields)/sizeof(atom_field*); ++i) {
+                 atom_field *field = atom_fields[i];
+                 for (int j = 0; j<field->n_keywords; ++j) {
+                   if (strcmp(tok, field->keywords[j]) == 0) {
+                     indices[field->field_type] = field_count-2;
+                     printf("cmp %s %s set %i %i\n", field->keywords[j], tok, field->field_type, indices[field->field_type]);
+                   }
+                 }
+               }
+               field_count++;
+      );
+
+    printf("RETURN: %p\n", indices);
+
+    return indices;
+}
 
 typedef struct dump_parse_ctxt {
   bool parsing_timestep;
@@ -447,7 +702,7 @@ parse_dump_line_on_the_fly(dump_parse_ctxt *ctxt, bool dump_xyz)
     }
   } else if (ctxt->parsing_atoms || ctxt->parsing_atoms_novel) {
     int ntok = 0;
-    char *tokens[dump_atom_fields_END];
+    char *tokens[dump_atom_field_END];
     token_iter(ctxt->line,
     	       " ",
     	       tok,
@@ -463,132 +718,132 @@ parse_dump_line_on_the_fly(dump_parse_ctxt *ctxt, bool dump_xyz)
       goto match_context;
     }
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_type]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_type]],
 		 ctxt->p->type,
 		 fprintf(stderr, "reparsing %s|ctxt %i line %i\n",
 			 ctxt->line,
-			 dump_atom_fields_type,
+			 dump_atom_field_type,
 			 ctxt->linen);
 		 goto match_context;
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_x]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_x]],
 		 ctxt->p->pos[0],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_x,
+			 dump_atom_field_x,
 			ctxt->linen, ctxt->line);
 		 goto match_context;
       );
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_y]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_y]],
 		 ctxt->p->pos[1],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_y,
+			 dump_atom_field_y,
 			ctxt->linen, ctxt->line);
 		 goto match_context;
       );
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_z]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_z]],
 		 ctxt->p->pos[2],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_z,
+			 dump_atom_field_z,
 			ctxt->linen, ctxt->line);
 		 exit(1);
       );
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qw]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qw]],
 		 ctxt->p->quat[0],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qw,
+			 dump_atom_field_qw,
 			ctxt->linen, ctxt->line);
 		 exit(1);
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qx]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qx]],
 		 ctxt->p->quat[1],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qx,
+			 dump_atom_field_qx,
 			ctxt->linen, ctxt->line);
 		 exit(1);
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qy]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qy]],
 		 ctxt->p->quat[2],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qy,
+			 dump_atom_field_qy,
 			ctxt->linen, ctxt->line);
 		 exit(1);
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qz]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qz]],
 		 ctxt->p->quat[3],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qz,
+			 dump_atom_field_qz,
 			ctxt->linen, ctxt->line);
 		 exit(1);
       );
 
     if (!ctxt->parsing_atoms_novel) {
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_vx]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_vx]],
 		   ctxt->p->vel[0],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_vx,
+			   dump_atom_field_vx,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_vy]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_vy]],
 		   ctxt->p->vel[1],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_vy,
+			   dump_atom_field_vy,
 			  ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_vz]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_vz]],
 		   ctxt->p->vel[2],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_vz,
+			   dump_atom_field_vz,
 			  ctxt->linen, ctxt->line);
 		   exit(1);
 	);
 
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_angmomx]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_angmomx]],
 		   ctxt->p->angmom[0],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_angmomx,
+			   dump_atom_field_angmomx,
 			  ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_angmomy]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_angmomy]],
 		   ctxt->p->angmom[1],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_angmomy,
+			   dump_atom_field_angmomy,
 			  ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_angmomz]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_angmomz]],
 		   ctxt->p->angmom[2],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_angmomz,
+			   dump_atom_field_angmomz,
 			  ctxt->linen, ctxt->line);
 		   exit(1);
 	);
 
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_mol]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_mol]],
 		   ctxt->p->mol,
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_mol,
+			   dump_atom_field_mol,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     } else {
-      parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_mol]],
+      parse_double(tokens[section_atoms_novel.indices[dump_atom_field_mol]],
 		   ctxt->p->mol,
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_mol,
+			   dump_atom_field_mol,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
@@ -619,7 +874,7 @@ parse_dump_line_on_the_fly(dump_parse_ctxt *ctxt, bool dump_xyz)
   }
 #undef match_header
 #undef match_header_debug
-  
+
   return p;
 }
 
@@ -628,19 +883,19 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 		bool flush)
 {
   ctxt->p = calloc(1, sizeof(particle));
-  
-  // sorted: flush end of file 
+
+  // sorted: flush end of file
   if ( ((ctxt->out_file && ctxt->parsed_natoms) &&
 	(ctxt->parsing_timestep	|| flush))) {
 
     int frag_counts = ctxt->ntypes*ctxt->nmols;
-    
+
     ctxt->last_atom_index = 1;
-    
+
     if (ctxt->frag_count)
-      free(ctxt->frag_count);    
+      free(ctxt->frag_count);
     ctxt->frag_count = calloc(frag_counts, sizeof(int));
-    
+
     // CG particles
     for (int i=0; i<ctxt->natoms; ++i) {
       particle p = ctxt->particles[i];
@@ -656,7 +911,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 						 ctxt->frag_count[frag_index],
 						 &p,
 						 fragments);
-      
+
       if (ctxt->frag_count[frag_index] + 1 == fragments->n) {
 	ctxt->frag_count[frag_index] = 0;
       } else {
@@ -672,18 +927,18 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       /* 	fprintf(ctxt->out_file, "%i\n", ctxt->natoms); */
       fclose(ctxt->out_file);
     }
-         
+
     dump_parse_ctxt_new_timestep(ctxt);
-      
+
     parse_double(ctxt->line, ctxt->ntimestep);
 
     sprintf(ctxt->out_filename,
 	    "%s.%08i",
 	    ctxt->prefix_file, ctxt->ntimestep);
-    
+
     open_file_assert(hout, ctxt->out_filename, "w");
     ctxt->out_file = hout;
-    
+
     ctxt->parsing_timestep = false;
   } else if (ctxt->parsing_natoms) {
     //printf("parsing_natoms from %s\n", ctxt->line);
@@ -696,12 +951,12 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 
     if (!ctxt->particles) {
       //printf("allocating %i particles\n", ctxt->natoms);
-      
+
       ctxt->particles = malloc(sizeof(particle)*ctxt->natoms);
       ctxt->particles_allocated = true;
     }
 
-    ctxt->parsing_natoms_count++;    
+    ctxt->parsing_natoms_count++;
   } else if ((ctxt->parsed_natoms) && (!ctxt->particles_allocated)) {
     //printf("parsed_natoms not allocated\n");
     if (!ctxt->particles) {
@@ -709,7 +964,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 
       ctxt->particles = malloc(sizeof(particle)*ctxt->natoms);
     }
-      
+
     if (!ctxt->particles) {
       fprintf(stderr, "ERROR allocating %i particles\n", ctxt->natoms);
       exit(1);
@@ -741,14 +996,14 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       );
 
     for (int i=0; i<2; ++i)
-      free(tokens[i]); 
+      free(tokens[i]);
 
     ctxt->bounds[ctxt->parsing_bounds_count] = hi-lo;
-    
+
     if (ctxt->parsing_bounds_count == 2) {
       ctxt->parsing_bounds = false;
       ctxt->parsing_bounds_count = 0;
-      
+
       fprintf(ctxt->out_file,
 	      "CRYST1 %8.3f %8.3f %8.3f  90.00  90.00  90.00 P 1           1\n",
 	      ctxt->bounds[0], ctxt->bounds[1], ctxt->bounds[2]);
@@ -756,10 +1011,10 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       ctxt->parsing_bounds_count++;
     }
   } else if (ctxt->parsing_atoms || ctxt->parsing_atoms_novel) {
-    /* printf("parsing_atoms\n"); */
+    printf("parsing_atoms\n");
     int ntok = 0;
-    char *tokens[dump_atom_fields_END]; 
-    
+    char *tokens[dump_atom_field_END];
+
     token_iter(ctxt->line,
 	       " ",
 	       tok,
@@ -775,22 +1030,22 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       /* 	      ntok, section_atoms_novel.nfields, ctxt->linen, ctxt->line); */
       goto match_context;
     }
-    
-    parse_int(tokens[section_atoms_novel.indices[dump_atom_fields_id]],
+
+    parse_int(tokens[section_atoms_novel.indices[dump_atom_field_id]],
 	      ctxt->p->atomID,
 	      fprintf(stderr, "reparsing %s|ctxt %i line %i\n",
 		      ctxt->line,
-		      dump_atom_fields_type,
+		      dump_atom_field_type,
 		      ctxt->linen);
 	      goto match_context;
       );
 
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_type]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_type]],
 		 ctxt->p->type,
 		 fprintf(stderr, "reparsing %s|ctxt %i line %i\n",
 			 ctxt->line,
-			 dump_atom_fields_type,
+			 dump_atom_field_type,
 			 ctxt->linen);
 		 goto match_context;
       );
@@ -799,115 +1054,115 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       ctxt->ntypes = ctxt->p->type;
     }
       
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_x]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_x]],
 		 ctxt->p->pos[0],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_x,
+			 dump_atom_field_x,
 			 ctxt->linen, ctxt->line);
 		 goto match_context;
       );
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_y]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_y]],
 		 ctxt->p->pos[1],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_y,
+			 dump_atom_field_y,
 			 ctxt->linen, ctxt->line);
 		 goto match_context;
       );
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_z]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_z]],
 		 ctxt->p->pos[2],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_z,
+			 dump_atom_field_z,
 			 ctxt->linen, ctxt->line);
 		 exit(1);
       );
 
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qw]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qw]],
 		 ctxt->p->quat[0],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qw,
+			 dump_atom_field_qw,
 			 ctxt->linen, ctxt->line);
 		 exit(1);
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qx]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qx]],
 		 ctxt->p->quat[1],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qx,
+			 dump_atom_field_qx,
 			 ctxt->linen, ctxt->line);
 		 exit(1);
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qy]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qy]],
 		 ctxt->p->quat[2],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qy,
+			 dump_atom_field_qy,
 			 ctxt->linen, ctxt->line);
 		 exit(1);
       );
     
-    parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_qz]],
+    parse_double(tokens[section_atoms_novel.indices[dump_atom_field_qz]],
 		 ctxt->p->quat[3],
 		 fprintf(stderr, "ctxt %i in line %i:%s\n",
-			 dump_atom_fields_qz,
+			 dump_atom_field_qz,
 			 ctxt->linen, ctxt->line);
 		 exit(1);
       );
 
     if (!ctxt->parsing_atoms_novel) {
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_vx]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_vx]],
 		   ctxt->p->vel[0],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_vx,
+			   dump_atom_field_vx,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_vy]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_vy]],
 		   ctxt->p->vel[1],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_vy,
+			   dump_atom_field_vy,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_vz]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_vz]],
 		   ctxt->p->vel[2],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_vz,
+			   dump_atom_field_vz,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
 
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_angmomx]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_angmomx]],
 		   ctxt->p->angmom[0],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_angmomx,
+			   dump_atom_field_angmomx,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_angmomy]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_angmomy]],
 		   ctxt->p->angmom[1],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_angmomy,
+			   dump_atom_field_angmomy,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
     
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_angmomz]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_angmomz]],
 		   ctxt->p->angmom[2],
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_angmomz,
+			   dump_atom_field_angmomz,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
 
-      parse_double(tokens[section_atoms.indices[dump_atom_fields_mol]],
+      parse_double(tokens[section_atoms.indices[dump_atom_field_mol]],
 		   ctxt->p->mol,
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_mol,
+			   dump_atom_field_mol,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
@@ -916,38 +1171,48 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 	ctxt->nmols = ctxt->p->mol;
       }
     } else {
-      parse_double(tokens[section_atoms_novel.indices[dump_atom_fields_mol]],
+      parse_double(tokens[section_atoms_novel.indices[dump_atom_field_mol]],
 		   ctxt->p->mol,
 		   fprintf(stderr, "ctxt %i in line %i:%s\n",
-			   dump_atom_fields_mol,
+			   dump_atom_field_mol,
 			   ctxt->linen, ctxt->line);
 		   exit(1);
 	);
-    }      
+    }
 
-    for (int i=0; i<dump_atom_fields_END; ++i)
-      free(tokens[i]); 
+    for (int i=0; i<dump_atom_field_END; ++i)
+      free(tokens[i]);
 
     ctxt->particles[ctxt->p->atomID-1] = *ctxt->p;
   } else {
     //printf("NOP %s\n", ctxt->line);
   }
 
-  match_context:  
+match_context:
 #define match_header_debug(header)						    \
   printf("match %s ? %i\n",							    \
 	 header, strncmp(header, ctxt->line, strlen(header))),			    \
-    (strncmp(header, ctxt->line, strlen(header)) == 0)			     
+    (strncmp(header, ctxt->line, strlen(header)) == 0)
 
 #define match_header(header)							    \
-  (strncmp(header, ctxt->line, strlen(header)) == 0)			     
+  (strncmp(header, ctxt->line, strlen(header)) == 0)
 
   if (match_header(section_timestep.header)) {
     ctxt->parsing_timestep = true;
   } else if (match_header(section_natoms.header)) {
-    ctxt->parsing_natoms = true;    
+    ctxt->parsing_natoms = true;
   } else if (match_header(section_bounds.header)) {
-    ctxt->parsing_bounds = true;    
+    ctxt->parsing_bounds = true;
+  } else if (match_header(section_atoms_generic.header)) {
+    int *indices = section_atoms_generic_parse(ctxt->line);
+    ctxt->section->indices = indices;
+
+    printf("here %p\n", indices);
+
+    for (int i = 0; i < dump_atom_field_END; i++) {
+      printf("%i \n", ctxt->section->indices[i]);
+    }
+    ctxt->parsing_atoms = true;
   } else if (match_header(section_atoms.header)
 	     || match_header(section_atoms_unwrap.header)) {
     ctxt->parsing_atoms = true;
@@ -978,9 +1243,9 @@ dump_transform(char const* in,
   ctxt.p = &p;
   ctxt.fragments = fragments;
   ctxt.prefix_file = strdup(prefix);
-  
+
   bool flush = !on_the_fly;
-  
+
   int linen = 1;
   while ((chars_read = getline(&line, &len, hin)) != -1) {
     line[chars_read-1] = '\0';
@@ -1005,9 +1270,9 @@ dump_transform(char const* in,
     particle *p = parse_dump_line(&ctxt, flush);
     if (p) free(p);
   }
-  
+
   fclose(hin);
-  
+
   free(ctxt.particles);
   free(ctxt.frag_count);
   free(ctxt.prefix_file);
