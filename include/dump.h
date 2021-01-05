@@ -345,7 +345,27 @@ section_atoms_generic_parse(char const* line) {
       );
 
     section_atoms.nfields = parsed_fields;
-    
+
+    for (size_t i=0; i<sizeof(atom_fields)/sizeof(atom_field*); ++i) {
+      atom_field *field = atom_fields[i];
+
+      if (!field->optional && !field->parsed) {
+        fprintf(stderr, "ERROR: a field with id ");
+
+        for (int j=0; j<field->n_keywords; ++j) {
+          fprintf(stderr, "%s",field->keywords[j]);
+
+          if (j < field->n_keywords-1) {
+            fprintf(stderr, " or ");
+          }
+        }
+
+        fprintf(stderr, " is supposed to be present\n");
+
+        exit(1);
+      }
+    }
+
     return indices;
 }
 
