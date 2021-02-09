@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
   char *output_prefix = NULL;
   /* bool dump_xyz = false; */
   bool on_the_fly = false;
-  
+
   char const short_options[] = "t:o:f";
   int optc = 0;
-  
+
   while ((optc = getopt (argc, argv, short_options)) != -1) {
     switch (optc) {
     case 't':
@@ -55,9 +55,9 @@ int main(int argc, char *argv[])
       exit(1);
     }
   }
-  
+
   struct fragments *fs[ntemplates];
-      
+
   for (int i=0; i<ntemplates; ++i) {
     fs[i] = fragment_parse_xyz(templates[i]);
   }
