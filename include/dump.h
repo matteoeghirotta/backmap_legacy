@@ -334,13 +334,14 @@ section_atoms_generic_parse(char const* line) {
                  atom_field *field = atom_fields[i];
                  for (int j = 0; j<field->n_keywords; ++j) {
                    // printf("debug %lu <%s>\n", strlen(field->keywords[j]), field->keywords[j]);
-                   if (strncmp(tok, field->keywords[j], strlen(field->keywords[j])) == 0) {
+                   if (strncmp(tok, field->keywords[j], strlen(tok)) == 0) {
                      indices[field->field_type] = field_count-2;
-                     // printf("cmp %s %s set %i %i\n",
+                     // printf("cmp %s %s set %i %i %i\n",
                      //        field->keywords[j],
                      //        tok,
                      //        field->field_type,
-                     //        indices[field->field_type]);
+                     //        indices[field->field_type],
+                     //        parsed_fields);
                      parsed_fields++;
                      field->parsed = true;
                    }
@@ -842,8 +843,8 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 {
   ctxt->p = calloc(1, sizeof(particle));
 
-  // printf("LINE %i <%s> %i\n", ctxt->linen, ctxt->line,
-  //        ctxt->parsed_configuration);
+  printf("LINE %i <%s> %i\n", ctxt->linen, ctxt->line,
+         ctxt->parsed_configuration);
 
   if (flush || ((ctxt->out_file && ctxt->parsed_natoms && ctxt->parsed_configuration) &&
 	(ctxt->parsing_timestep	|| flush))) {
@@ -882,11 +883,9 @@ parse_dump_line(dump_parse_ctxt *ctxt,
   }
 
   if (ctxt->parsing_timestep) {
-    // printf("parsing_timestep\n");
+    printf("parsing_timestep from %s\n", ctxt->line);
 
     if (ctxt->out_file) {
-      /* if (dump_xyz) */
-      /* 	fprintf(ctxt->out_file, "%i\n", ctxt->natoms); */
       fclose(ctxt->out_file);
     }
 
@@ -903,7 +902,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 
     ctxt->parsing_timestep = false;
   } else if (ctxt->parsing_natoms) {
-    // printf("parsing_natoms from %s\n", ctxt->line);
+    printf("parsing_natoms from %s\n", ctxt->line);
 
     if (ctxt->parsing_natoms_count == 0) {
       ctxt->natoms = atoi(ctxt->line);
@@ -933,11 +932,11 @@ parse_dump_line(dump_parse_ctxt *ctxt,
     }
 
     ctxt->particles_allocated = true;
-  } else if (ctxt->parsed_natoms && ctxt->particles_allocated && (ctxt->parsing_timestep	|| flush)) {
+  } else if (ctxt->parsed_natoms && ctxt->particles_allocated && (ctxt->parsing_timestep || flush)) {
     printf("parsed 1st conf %i %s\n", ctxt->linen, ctxt->line);
     ctxt->parsed_configuration = true;
   } else if (ctxt->parsing_bounds) {
-    // printf("parsing bounds\n");
+    printf("parsing bounds\n");
     int ntok = 0;
     char *tokens[2];
     token_iter(ctxt->line,
@@ -976,7 +975,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       ctxt->parsing_bounds_count++;
     }
   } else if (ctxt->parsing_atoms) {
-    // printf("parsing_natoms from %s\n", ctxt->line);
+    printf("parsing_atoms from %s\n", ctxt->line);
 
     int ntok = 0;
     char *tokens[dump_atom_field_END];
@@ -988,11 +987,14 @@ parse_dump_line(dump_parse_ctxt *ctxt,
                if (tok) tokens[ntok++] = strdup(tok);
       );
 
-    // if (ntok != section_atoms.nfields) {
-    //   // fprintf(stderr, "n %i instead of %i REPARSE line %i : %s\n",
-    //   //               ntok, section_atoms.nfields, ctxt->linen, ctxt->line);
-    //   goto match_context;
-    // }
+    if (ntok != section_atoms.nfields) {
+      // fprintf(stderr, "n %i instead of %i REPARSE line %i : %s\n",
+      //               ntok, section_atoms.nfields, ctxt->linen, ctxt->line);
+
+      ctxt->parsed_configuration = true;
+
+      goto match_context;
+    }
 
     if (section_atoms.indices[dump_atom_field_id] != -1)
       parse_int(tokens[section_atoms.indices[dump_atom_field_id]],
