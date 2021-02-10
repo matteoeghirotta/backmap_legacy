@@ -843,8 +843,8 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 {
   ctxt->p = calloc(1, sizeof(particle));
 
-  printf("LINE %i <%s> %i\n", ctxt->linen, ctxt->line,
-         ctxt->parsed_configuration);
+  // printf("LINE %i <%s> %i\n", ctxt->linen, ctxt->line,
+  //       ctxt->parsed_configuration);
 
   if (flush || ((ctxt->out_file && ctxt->parsed_natoms && ctxt->parsed_configuration) &&
 	(ctxt->parsing_timestep	|| flush))) {
@@ -883,7 +883,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
   }
 
   if (ctxt->parsing_timestep) {
-    printf("parsing_timestep from %s\n", ctxt->line);
+    printf("Parsing timestep: %s\r", ctxt->line);
 
     if (ctxt->out_file) {
       fclose(ctxt->out_file);
@@ -902,7 +902,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 
     ctxt->parsing_timestep = false;
   } else if (ctxt->parsing_natoms) {
-    printf("parsing_natoms from %s\n", ctxt->line);
+    // printf("parsing_natoms from %s\n", ctxt->line);
 
     if (ctxt->parsing_natoms_count == 0) {
       ctxt->natoms = atoi(ctxt->line);
@@ -936,7 +936,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
     printf("parsed 1st conf %i %s\n", ctxt->linen, ctxt->line);
     ctxt->parsed_configuration = true;
   } else if (ctxt->parsing_bounds) {
-    printf("parsing bounds\n");
+    // printf("parsing bounds\n");
     int ntok = 0;
     char *tokens[2];
     token_iter(ctxt->line,
@@ -975,7 +975,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
       ctxt->parsing_bounds_count++;
     }
   } else if (ctxt->parsing_atoms) {
-    printf("parsing_atoms from %s\n", ctxt->line);
+    // printf("parsing_atoms from %s\n", ctxt->line);
 
     int ntok = 0;
     char *tokens[dump_atom_field_END];
@@ -1230,7 +1230,7 @@ dump_transform(char const* in,
 
   if (!on_the_fly) {
     flush = true;
-    printf("flushing\n");
+    printf("\nflushing\n");
     particle *p = parse_dump_line(&ctxt, flush);
     if (p) free(p);
   }
