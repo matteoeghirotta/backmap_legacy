@@ -332,9 +332,9 @@ section_atoms_generic_parse(char const* line) {
                // printf("DEBUG %2i <%s>\n", field_count, tok);
                for (size_t i=0; i<sizeof(atom_fields)/sizeof(atom_field*); ++i) {
                  atom_field *field = atom_fields[i];
-                 // int j = 0;
-                 // do {
-                 for (int j = 0; j<field->n_keywords; ++j) {
+                 int j = 0;
+                 do {
+                 // for (int j = 0; j<field->n_keywords; ++j) {
                    // printf("debug %lu <%s> / %i\n", strlen(field->keywords[j]), field->keywords[j], field->n_keywords);
                    if (strncmp(tok, field->keywords[j], strlen(field->keywords[j])) == 0) {
                    // if (strncmp(tok, field->keywords[j], strlen(tok)) == 0) {
@@ -349,8 +349,8 @@ section_atoms_generic_parse(char const* line) {
                      field->parsed = true;
                    }
 
-                   // j++;
-                 } //while(!field->parsed || j > field->n_keywords);
+                   j++;
+                 } while(!field->parsed && j < field->n_keywords);
                }
                field_count++;
       );
