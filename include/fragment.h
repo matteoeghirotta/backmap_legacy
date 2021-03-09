@@ -30,15 +30,15 @@ fragment_parse_equivalents(FILE *h,
 
   fragment *f = calloc(1, sizeof(fragment));
   f->filename = strdup(filename);
-  
+
   // number of atoms
   if ((chars_read = getline(&line, &len, h)) != -1) {
-    f->natoms = strtod(line, &endptr);  
+    f->natoms = strtod(line, &endptr);
 
     if ((chars_read == 1) && (strncmp(line, "\n", 1) == 0)) {
       goto cleanup;
     }
-    
+
     if ((*endptr != '\n')
         &&
         (*endptr != ' ')) {
@@ -144,7 +144,7 @@ fragment_parse_xyz(char const* filename)
   fs->n = 0;
 
   fragment *f = NULL;
-  
+
   do {
     f = fragment_parse_equivalents(h, filename);
 
@@ -156,9 +156,9 @@ fragment_parse_xyz(char const* filename)
   } while (f);
 
   printf("fragment %s has %i fragments\n", filename, fs->n);
-  
+
   fclose(h);
-	
+
   return fs;
 }
 

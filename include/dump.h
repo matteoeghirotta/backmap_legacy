@@ -332,9 +332,12 @@ section_atoms_generic_parse(char const* line) {
                // printf("DEBUG %2i <%s>\n", field_count, tok);
                for (size_t i=0; i<sizeof(atom_fields)/sizeof(atom_field*); ++i) {
                  atom_field *field = atom_fields[i];
+                 // int j = 0;
+                 // do {
                  for (int j = 0; j<field->n_keywords; ++j) {
-                   // printf("debug %lu <%s>\n", strlen(field->keywords[j]), field->keywords[j]);
-                   if (strncmp(tok, field->keywords[j], strlen(tok)) == 0) {
+                   // printf("debug %lu <%s> / %i\n", strlen(field->keywords[j]), field->keywords[j], field->n_keywords);
+                   if (strncmp(tok, field->keywords[j], strlen(field->keywords[j])) == 0) {
+                   // if (strncmp(tok, field->keywords[j], strlen(tok)) == 0) {
                      indices[field->field_type] = field_count-2;
                      // printf("cmp %s %s set %i %i %i\n",
                      //        field->keywords[j],
@@ -345,7 +348,9 @@ section_atoms_generic_parse(char const* line) {
                      parsed_fields++;
                      field->parsed = true;
                    }
-                 }
+
+                   // j++;
+                 } //while(!field->parsed || j > field->n_keywords);
                }
                field_count++;
       );
@@ -526,12 +531,12 @@ particle_transform(FILE *out_file,
   char *long_pdb_fmt = "ATOM  %5x %-4s %-.3s%1s%5i    %8.3f%8.3f%8.3f%6.2f%6.2f  %10s\n";
 
   fragment *frag = &fragments->fragments[frag_index];
-  
+
   double mat[3][3];
   quat_to_mat(p->quat, mat);
 
   int current_atom = atom_index;
-  
+
   // atomistic particles
   for (int i=0; i<frag->natoms; ++i) {
     atom a = frag->atoms[i];
@@ -542,13 +547,13 @@ particle_transform(FILE *out_file,
     char *atom_name = atom_name_strip_markers(t.name);
     char const* chain_id = " ";
     char *atom_type = atom_name_strip(t.name);
-    
+
     char *fmt = NULL;
     if (current_atom > 99999) //  100000
       fmt = long_pdb_fmt;
     else
       fmt = pdb_fmt;
-    
+
     fprintf(out_file,
 	    fmt,
 	    current_atom++,
@@ -846,41 +851,6 @@ parse_dump_line(dump_parse_ctxt *ctxt,
   // printf("LINE %i <%s> %i\n", ctxt->linen, ctxt->line,
   //       ctxt->parsed_configuration);
 
-  if (flush || ((ctxt->out_file && ctxt->parsed_natoms && ctxt->parsed_configuration) &&
-	(ctxt->parsing_timestep	|| flush))) {
-
-    int frag_counts = ctxt->ntypes*ctxt->nmols;
-
-    ctxt->last_atom_index = 1;
-
-    if (ctxt->frag_count)
-      free(ctxt->frag_count);
-
-    ctxt->frag_count = calloc(frag_counts, sizeof(int));
-
-    // CG particles
-    for (int i=0; i<ctxt->natoms; ++i) {
-      particle p = ctxt->particles[i];
-      int atom_type = p.type-1;
-      int mol_index = p.mol-1;
-      struct fragments *fragments = ctxt->fragments[atom_type];
-      int frag_index = ctxt->ntypes*mol_index + atom_type;
-
-      assert(frag_index < frag_counts);
-
-      ctxt->last_atom_index = particle_transform(ctxt->out_file,
-						 ctxt->last_atom_index,
-						 ctxt->frag_count[frag_index],
-						 &p,
-						 fragments);
-
-      if (ctxt->frag_count[frag_index] + 1 == fragments->n) {
-	ctxt->frag_count[frag_index] = 0;
-      } else {
-	ctxt->frag_count[frag_index]++;
-      }
-    }
-  }
 
   if (ctxt->parsing_timestep) {
     printf("Parsing timestep: %s\r", ctxt->line);
@@ -933,7 +903,7 @@ parse_dump_line(dump_parse_ctxt *ctxt,
 
     ctxt->particles_allocated = true;
   } else if (ctxt->parsed_natoms && ctxt->particles_allocated && (ctxt->parsing_timestep || flush)) {
-    printf("parsed 1st conf %i %s\n", ctxt->linen, ctxt->line);
+    // printf("parsed 1st conf %i %s\n", ctxt->linen, ctxt->line);
     ctxt->parsed_configuration = true;
   } else if (ctxt->parsing_bounds) {
     // printf("parsing bounds\n");
@@ -1016,7 +986,6 @@ parse_dump_line(dump_parse_ctxt *ctxt,
                            ctxt->linen);
                    goto match_context;
                   );
-
 
     if (ctxt->p->type > ctxt->ntypes) {
       ctxt->ntypes = ctxt->p->type;
@@ -1156,6 +1125,42 @@ parse_dump_line(dump_parse_ctxt *ctxt,
     //   free(tokens[i]);
 
     ctxt->particles[ctxt->p->atomID-1] = *ctxt->p;
+  }
+
+  if (flush || ((ctxt->out_file && ctxt->parsed_natoms && ctxt->parsed_configuration) &&
+	(ctxt->parsing_timestep	|| flush))) {
+
+    int frag_counts = ctxt->ntypes*ctxt->nmols;
+
+    ctxt->last_atom_index = 1;
+
+    if (ctxt->frag_count)
+      free(ctxt->frag_count);
+
+    ctxt->frag_count = calloc(frag_counts, sizeof(int));
+
+    // CG particles
+    for (int i=0; i<ctxt->natoms; ++i) {
+      particle p = ctxt->particles[i];
+      int atom_type = p.type-1;
+      int mol_index = p.mol-1;
+      struct fragments *fragments = ctxt->fragments[atom_type];
+      int frag_index = ctxt->ntypes*mol_index + atom_type;
+
+      assert(frag_index < frag_counts);
+
+      ctxt->last_atom_index = particle_transform(ctxt->out_file,
+						 ctxt->last_atom_index,
+						 ctxt->frag_count[frag_index],
+						 &p,
+						 fragments);
+
+      if (ctxt->frag_count[frag_index] + 1 == fragments->n) {
+	ctxt->frag_count[frag_index] = 0;
+      } else {
+	ctxt->frag_count[frag_index]++;
+      }
+    }
   }
 
 match_context:
