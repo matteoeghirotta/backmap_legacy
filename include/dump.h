@@ -104,11 +104,12 @@ atom_field atom_field_qw = {
   .field_type = dump_atom_field_qw,
   .optional = false,
   .parsed = false,
-  .n_keywords = 3,
+  .n_keywords = 4,
   .keywords = {
     "qw",
     "quatw",
-    "c_q[1]"
+    "c_q[1]",
+    "c_orient[1]"
   }
 };
 
@@ -116,11 +117,12 @@ atom_field atom_field_qx = {
   .field_type = dump_atom_field_qx,
   .optional = false,
   .parsed = false,
-  .n_keywords = 3,
+  .n_keywords = 4,
   .keywords = {
     "qx",
     "quatx",
-    "c_q[2]"
+    "c_q[2]",
+    "c_orient[2]"
   }
 };
 
@@ -128,11 +130,12 @@ atom_field atom_field_qy = {
   .field_type = dump_atom_field_qy,
   .optional = false,
   .parsed = false,
-  .n_keywords = 3,
+  .n_keywords = 4,
   .keywords = {
     "qy",
     "quaty",
-    "c_q[3]"
+    "c_q[3]",
+    "c_orient[3]"
   }
 };
 
@@ -140,11 +143,12 @@ atom_field atom_field_qz = {
   .field_type = dump_atom_field_qz,
   .optional = false,
   .parsed = false,
-  .n_keywords = 3,
+  .n_keywords = 4,
   .keywords = {
     "qz",
     "quatz",
-    "c_q[4]"
+    "c_q[4]",
+    "c_orient[4]"
   }
 };
 
