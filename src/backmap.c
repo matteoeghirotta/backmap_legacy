@@ -3,23 +3,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include "usage.h"
 #include "fragment.h"
 #include "dump.h"
-
-void usage(char *progname)
-{
-  fprintf(stderr, "Usage: %s [[-s] [-t <templates>] -o <out-prefix>] "
-	  "dumpfilename\n",
-	  progname);
-  exit(EXIT_FAILURE);
-}
 
 int main(int argc, char *argv[])
 {
   char **templates = NULL;
   int ntemplates = 0;
   char *output_prefix = NULL;
-  /* bool dump_xyz = false; */
   bool on_the_fly = false;
 
   char const short_options[] = "t:o:f";
@@ -34,9 +26,6 @@ int main(int argc, char *argv[])
     case 'o':
       output_prefix = strdup(optarg);
       break;
-    /* case 'x': */
-    /*   dump_xyz = true; */
-    /*   break; */
     case 'f':
       on_the_fly = true;
       break;
