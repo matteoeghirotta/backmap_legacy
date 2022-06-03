@@ -1,4 +1,4 @@
-AC_PREREQ([2.69])
+AC_PREREQ([2.71])
 AC_INIT([backmap],[0.0],[matteoeghirotta@gmail.com])
 AM_INIT_AUTOMAKE([foreign dist-xz -Wall -Werror]) # silent-rules
 AC_CONFIG_SRCDIR([src/backmap.c])
