@@ -3,7 +3,7 @@ AM_CFLAGS =
 bin_PROGRAMS = backmap
 backmap_SANITIZE = -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer
 backmap_SOURCES = backmap.c trie.c
-backmap_DEBUG_FLAGS = -g -Wall -Wextra -Werror -Wno-nullability-completeness
+backmap_DEBUG_FLAGS = -g3 -Wall -Wextra -Werror -Wno-nullability-completeness
 backmap_CFLAGS = $(backmap_DEBUG_FLAGS) # $(backmap_SANITIZE)
 backmap_CPPFLAGS = -I$(top_srcdir)/include
 #backmap_LDFLAGS = -static

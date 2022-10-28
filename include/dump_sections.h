@@ -1,6 +1,8 @@
 #ifndef	DUMP_SECTIONS_H
 #define	DUMP_SECTIONS_H
 
+#include "verbose.h"
+
 typedef struct section {
   char const *header;
   int nfields;
@@ -37,9 +39,7 @@ section section_atoms = {
 };
 
 int *
-section_atoms_generic_parse(char const* line) {
-    // printf("LINE: %s of %i\n", line, dump_atom_field_END);
-
+section_atoms_generic_parse(char const* line, verbose_level verbose) {
     int *indices = calloc(dump_atom_field_END, sizeof(int));
     for (int i = 0; i < dump_atom_field_END; i++) {
       indices[i] = -1;
@@ -47,53 +47,65 @@ section_atoms_generic_parse(char const* line) {
 
     int field_count = 0;
     int parsed_fields = 0;
+    size_t n_atom_fields = sizeof(atom_fields)/sizeof(atom_field*);
+    bool parsed_token = false;
 
     token_iter(line,
 	       " ",
 	       tok,
-               // printf("DEBUG %2i <%s>\n", field_count, tok);
-               for (size_t i=0; i<sizeof(atom_fields)/sizeof(atom_field*); ++i) {
+               parsed_token = false;
+
+               if (verbose >= TOP) {
+                 printf("TOKEN %s n %i\n", tok, field_count);
+               }
+
+               size_t i = 0;
+
+               do {
                  atom_field *field = atom_fields[i];
                  int j = 0;
+
                  do {
-                 // for (int j = 0; j<field->n_keywords; ++j) {
-                   // printf("debug %lu <%s> / %i\n", strlen(field->keywords[j]), field->keywords[j], field->n_keywords);
-                   if (strncmp(tok, field->keywords[j], strlen(field->keywords[j])) == 0) {
-                   // if (strncmp(tok, field->keywords[j], strlen(tok)) == 0) {
+                   if (verbose >= TOP) {
+                     printf("CMP %s wrt %s (%i) ? %i, parsed %i\n", tok, field->keywords[j], field->n_keywords, strcmp(tok, field->keywords[j]), parsed_fields);
+                   }
+
+                   if (strcmp(tok, field->keywords[j]) == 0) {
                      indices[field->field_type] = field_count-2;
-                     // printf("cmp %s %s set %i %i %i\n",
-                     //        field->keywords[j],
-                     //        tok,
-                     //        field->field_type,
-                     //        indices[field->field_type],
-                     //        parsed_fields);
                      parsed_fields++;
                      field->parsed = true;
+                     parsed_token = true;
                    }
 
                    j++;
                  } while(!field->parsed && j < field->n_keywords);
-               }
+
+                 i++;
+               } while (!parsed_token && i<n_atom_fields);
+
                field_count++;
       );
 
     section_atoms.nfields = parsed_fields;
 
-    for (size_t i=0; i<sizeof(atom_fields)/sizeof(atom_field*); ++i) {
+    printf("COUNTED ON LINE: %s of %i\n", line, dump_atom_field_END);
+    printf("COUNTED FIELDS %i\n", parsed_fields);
+
+    for (size_t i=0; i<n_atom_fields; ++i) {
       atom_field *field = atom_fields[i];
 
       if (!field->optional && !field->parsed) {
-        fprintf(stderr, "ERROR: a field with id ");
+        printf("ERROR: a field with id ");
 
         for (int j=0; j<field->n_keywords; ++j) {
-          fprintf(stderr, "%s",field->keywords[j]);
+          printf("\"%s\"",field->keywords[j]);
 
           if (j < field->n_keywords-1) {
-            fprintf(stderr, " or ");
+            printf(" or ");
           }
         }
 
-        fprintf(stderr, " is supposed to be present\n");
+        printf(" is supposed to be present\n");
 
         exit(1);
       }
@@ -102,6 +114,10 @@ section_atoms_generic_parse(char const* line) {
     // for (int i = 0; i < dump_atom_field_END; i++) {
     //   printf("Indices %i %i \n", i, indices[i]);
     // }
+
+    // reset parsed atom_fields for next iteration
+    for (size_t i=0; i<n_atom_fields; i++)
+      atom_fields[i]->parsed = false;
 
     return indices;
 }

@@ -89,20 +89,20 @@ fragment_parse_equivalents(FILE *h,
     int i = 0;
     while ((token = strtok_r(NULL, delim, &save_ptr))
 	   && (i < 3)) {
-      f->atoms[natom].pos[i++] = strtod(token, &endptr);  
+      f->atoms[natom].pos[i++] = strtod(token, &endptr);
+      //printf("%f ", f->atoms[natom].pos[i-1]);
     }
+    //printf("\n");
 
     natom++;
     savepos = ftell(h);
   }
 
-  /* printf("FRAGMENT %s has %i atoms\n", filename, natom); */
-
-  free(line);  
+  free(line);
   return f;
 
   cleanup:
-  free(line);  
+  free(line);
   free(f);
   f = NULL;
   return f;
@@ -155,7 +155,7 @@ fragment_parse_xyz(char const* filename)
     }
   } while (f);
 
-  printf("fragment %s has %i fragments\n", filename, fs->n);
+  //printf("fragment %s has %i fragments\n", filename, fs->n);
 
   fclose(h);
 

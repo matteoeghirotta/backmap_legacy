@@ -13,8 +13,9 @@ int main(int argc, char *argv[])
   int ntemplates = 0;
   char *output_prefix = NULL;
   bool on_the_fly = false;
+  int verbose = 0;
 
-  char const short_options[] = "t:o:f";
+  char const short_options[] = "t:o:fv:";
   int optc = 0;
 
   while ((optc = getopt (argc, argv, short_options)) != -1) {
@@ -28,6 +29,9 @@ int main(int argc, char *argv[])
       break;
     case 'f':
       on_the_fly = true;
+      break;
+    case 'v':
+      verbose = atoi(optarg);
       break;
     default:
       usage(argv[0]);
@@ -55,7 +59,7 @@ int main(int argc, char *argv[])
     usage(argv[0]);
   }
 
-  dump_transform(dumpfilename, output_prefix, fs, on_the_fly);
+  dump_transform(dumpfilename, output_prefix, fs, on_the_fly, verbose);
 
   free(output_prefix);
 

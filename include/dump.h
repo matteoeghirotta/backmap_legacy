@@ -17,13 +17,15 @@
 #include "dump_atom_fields.h"
 #include "dump_sections.h"
 #include "dump_parse.h"
+#include "dump_parse_on_the_fly.h"
 #include "particle_transform.h"
 
 void
 dump_transform(char const* in,
 	       char const* prefix,
 	       fragments **fragments,
-	       bool on_the_fly)
+	       bool on_the_fly,
+               int verbose)
 {
   open_file_assert(hin, in, "r");
 
@@ -37,7 +39,7 @@ dump_transform(char const* in,
   ctxt.fragments = fragments;
   ctxt.prefix_file = strdup(prefix);
 
-  bool flush = !on_the_fly;
+  //bool flush = !on_the_fly;
 
   int linen = 1;
   while ((chars_read = getline(&line, &len, hin)) != -1) {
@@ -53,17 +55,16 @@ dump_transform(char const* in,
 				      false);
       }
     } else {
-      p = parse_dump_line(&ctxt, false);
+      p = parse_dump_line(&ctxt, false, verbose);
       if (p) free(p);
     }
   }
 
-  if (!on_the_fly) {
-    flush = true;
-    printf("\nflushing\n");
-    particle *p = parse_dump_line(&ctxt, flush);
-    if (p) free(p);
-  }
+  //if (!on_the_fly) {
+    //flush = true;
+    //particle *p = parse_dump_line(&ctxt, flush, verbose);
+    //if (p) free(p);
+  //}
 
   fclose(hin);
 

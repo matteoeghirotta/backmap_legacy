@@ -20,6 +20,7 @@ typedef struct dump_parse_ctxt {
   char *out_filename;
   char *prefix_file;
   int natoms;
+  int natoms_parsed;
   int nmols;
   int ntypes;
   int current_atom;
@@ -53,6 +54,7 @@ dump_parse_ctxt_new_timestep(dump_parse_ctxt *ctxt)
   ctxt->parsing_atoms_novel = false;
   memset(ctxt->bounds, 0, sizeof(double)*3);
 
+  ctxt->natoms_parsed = 0;
   ctxt->natoms = 0;
   ctxt->current_atom = 0;
   ctxt->nmols = 0;
@@ -62,6 +64,50 @@ dump_parse_ctxt_new_timestep(dump_parse_ctxt *ctxt)
   ctxt->particles_allocated = false;
   ctxt->last_atom_index = 0;
   ctxt->frag_count = NULL;
+}
+
+void
+dump_parse_ctxt_print(dump_parse_ctxt *ctxt)
+{
+  printf("CTXT:%p\n", ctxt);
+  //ctxt->out_filename
+  //ctxt->parsing_timestep
+  //ctxt->parsing_natoms
+  //ctxt->parsed_natoms
+  //ctxt->parsed_configuration
+  //ctxt->parsing_bounds
+  //ctxt->parsing_bounds_count
+  //ctxt->parsing_natoms_count
+  //ctxt->parsing_atoms
+  //ctxt->parsing_atoms_novel
+  //ctxt->natoms
+  //ctxt->current_atom
+  //ctxt->nmols
+  //ctxt->ntypes
+  //ctxt->particles
+  //ctxt->fragments
+  //ctxt->particles_allocated
+  //ctxt->last_atom_index
+  //ctxt->frag_count",
+  //ctxt->out_filename,
+  //ctxt->parsing_timestep,
+  //ctxt->parsing_natoms,
+  //ctxt->parsed_natoms,
+  //ctxt->parsed_configuration,
+  //ctxt->parsing_bounds,
+  //ctxt->parsing_bounds_count,
+  //ctxt->parsing_natoms_count,
+  //ctxt->parsing_atoms,
+  //ctxt->parsing_atoms_novel,
+  //ctxt->natoms,
+  //ctxt->current_atom,
+  //ctxt->nmols,
+  //ctxt->ntypes,
+  //ctxt->particles,
+  //ctxt->fragments,
+  //ctxt->particles_allocated,
+  //ctxt->last_atom_index,
+  //ctxt->frag_count");
 }
 
 #endif	    /* !DUMP_PARSE_CTXT_H_ */

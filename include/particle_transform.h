@@ -16,7 +16,7 @@ particle_transform_on_the_fly(dump_parse_ctxt *ctxt,
 
   double mat[3][3];
   quat_to_mat(ctxt->p->quat, mat);
-  
+
   //print_mat(mat);
   /* double matrev[3][3]; */
   /* quat_to_mat_trans(ctxt->p->quat, matrev); */
@@ -84,8 +84,11 @@ particle_transform(FILE *out_file,
   char *pdb_fmt      = "ATOM  %5i %-4s %-.3s%1s%5i    %8.3f%8.3f%8.3f%6.2f%6.2f  %10s\n";
   char *long_pdb_fmt = "ATOM  %5x %-4s %-.3s%1s%5i    %8.3f%8.3f%8.3f%6.2f%6.2f  %10s\n";
 
+  printf("FRAG %i %i\n", frag_index, atom_index);
+
   fragment *frag = &fragments->fragments[frag_index];
 
+    printf(" %i\n", frag->natoms);
   double mat[3][3];
   quat_to_mat(p->quat, mat);
 
@@ -93,6 +96,7 @@ particle_transform(FILE *out_file,
 
   // atomistic particles
   for (int i=0; i<frag->natoms; ++i) {
+    printf("tr %i/%i\n", i, frag->natoms);
     atom a = frag->atoms[i];
     atom r = rotate(a, mat);
     atom t = translate(r, p->pos);
