@@ -104,10 +104,11 @@ atom_field atom_field_qx = {
   .field_type = dump_atom_field_qx,
   .optional = false,
   .parsed = false,
-  .n_keywords = 4,
+  .n_keywords = 5,
   .keywords = {
     "qx",
     "quatx",
+    "quati",
     "c_q[2]",
     "c_orient[2]"
   }
@@ -117,10 +118,11 @@ atom_field atom_field_qy = {
   .field_type = dump_atom_field_qy,
   .optional = false,
   .parsed = false,
-  .n_keywords = 4,
+  .n_keywords = 5,
   .keywords = {
     "qy",
     "quaty",
+    "quatj",
     "c_q[3]",
     "c_orient[3]"
   }
@@ -130,10 +132,11 @@ atom_field atom_field_qz = {
   .field_type = dump_atom_field_qz,
   .optional = false,
   .parsed = false,
-  .n_keywords = 4,
+  .n_keywords = 5,
   .keywords = {
     "qz",
     "quatz",
+    "quatk",
     "c_q[4]",
     "c_orient[4]"
   }
@@ -143,10 +146,12 @@ atom_field atom_field_shapex = {
   .field_type = dump_atom_field_shapex,
   .optional = true,
   .parsed = false,
-  .n_keywords = 2,
+  .n_keywords = 4,
   .keywords = {
     "c_shape[1]",
-    "shapex"
+    "shapex",
+    "c_diameter[1]",
+    "diameterx"
   }
 };
 
@@ -154,10 +159,12 @@ atom_field atom_field_shapey = {
   .field_type = dump_atom_field_shapey,
   .optional = true,
   .parsed = false,
-  .n_keywords = 2,
+  .n_keywords = 4,
   .keywords = {
     "c_shape[2]",
-    "shapey"
+    "shapey",
+    "c_diameter[2]",
+    "diametery"
   }
 };
 
@@ -165,10 +172,12 @@ atom_field atom_field_shapez = {
   .field_type = dump_atom_field_shapez,
   .optional = true,
   .parsed = false,
-  .n_keywords = 2,
+  .n_keywords = 4,
   .keywords = {
     "c_shape[3]",
-    "shapez"
+    "shapez",
+    "c_diameter[3]",
+    "diameterz"
   }
 };
 
