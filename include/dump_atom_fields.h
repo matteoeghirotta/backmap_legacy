@@ -96,7 +96,7 @@ atom_field atom_field_qw = {
     "qw",
     "quatw",
     "c_q[1]",
-    "c_orient[1]"
+    "c_orient[4]"
   }
 };
 
@@ -110,7 +110,7 @@ atom_field atom_field_qx = {
     "quatx",
     "quati",
     "c_q[2]",
-    "c_orient[2]"
+    "c_orient[1]"
   }
 };
 
@@ -124,7 +124,7 @@ atom_field atom_field_qy = {
     "quaty",
     "quatj",
     "c_q[3]",
-    "c_orient[3]"
+    "c_orient[2]"
   }
 };
 
@@ -138,7 +138,7 @@ atom_field atom_field_qz = {
     "quatz",
     "quatk",
     "c_q[4]",
-    "c_orient[4]"
+    "c_orient[3]"
   }
 };
 
